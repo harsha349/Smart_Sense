@@ -1,4 +1,4 @@
-<!doctype html>
+<!-- <!doctype html>
 <html>
 <head>
   <meta charset="utf-8" />
@@ -16,6 +16,267 @@
   </select>
   <button id="upload">Analyze</button>
   <pre id="out" style="white-space:pre-wrap;background:#f6f6f6;padding:10px;border-radius:6px;"></pre>
+<script src="app.js"></script>
+</body>
+</html> -->
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartPantry AI</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f2f2f2; margin: 0; padding: 0; }
+    #chat-container {
+      width: 100%;
+      max-width: 600px;
+      height: 80vh;
+      margin: 20px auto;
+      background: #fff;
+      border-radius: 10px;
+      padding: 15px;
+      overflow-y: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .message { margin: 10px 0; padding: 10px 15px; border-radius: 15px; max-width: 75%; }
+    .user { background: #0084ff; color: white; margin-left: auto; text-align: right; }
+    .bot { background: #e5e5ea; color: black; margin-right: auto; text-align: left; }
+    #controls { width: 100%; max-width: 600px; margin: 0 auto; display: flex; justify-content: space-between; padding: 0 15px; }
+    #image-input { flex: 1; }
+    #send-btn { margin-left: 10px; padding: 8px 15px; }
+    .recipe, .grocery, .nutrition { margin-top: 8px; font-size: 0.9em; }
+    .recipe-title { font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<div id="chat-container"></div>
+
+<div id="controls">
+  <input type="file" id="image-input">
+  <select id="diet">
+    <option value="none">No diet</option>
+    <option value="keto">Keto</option>
+    <option value="vegan">Vegan</option>
+    <option value="vegetarian">Vegetarian</option>
+  </select>
+  <button id="send-btn">Send</button>
+</div>
+
+<script>
+const chatContainer = document.getElementById('chat-container');
+const sendBtn = document.getElementById('send-btn');
+const imageInput = document.getElementById('image-input');
+const dietSelect = document.getElementById('diet');
+
+// Append a message to chat container
+function appendMessage(text, sender='bot') {
+  const msg = document.createElement('div');
+  msg.className = message ${sender};
+  msg.innerHTML = text;
+  chatContainer.appendChild(msg);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+sendBtn.onclick = async () => {
+  const file = imageInput.files[0];
+  if (!file) {
+    alert('Please select an image!');
+    return;
+  }
+
+  const diet = dietSelect.value;
+
+  // Show user message
+  appendMessage('You uploaded an image', 'user');
+
+  // Prepare form data
+  const formData = new FormData();
+  formData.append('image', file);
+  formData.append('diet', diet);
+  formData.append('user_id', 'anonymous');
+
+  // Call backend
+  appendMessage('Processing...', 'bot');
+  try {
+    const res = await fetch('/api/analyze', { method: 'POST', body: formData });
+    const data = await res.json();
+
+    // Remove the "Processing..." message
+    chatContainer.lastChild.remove();
+
+    // Format bot response
+    let botHtml = '';
+
+    // Recipes
+    if (data.recipes && data.recipes.recipes.length > 0) {
+      botHtml += '<div class="recipe"><b>Recipes:</b><ul>';
+      data.recipes.recipes.forEach(r => {
+        botHtml += <li class="recipe-title">${r.title} (Servings: ${r.servings}, Time: ${r.time})<br>Steps: ${r.steps.join(', ')}</li>;
+      });
+      botHtml += '</ul></div>';
+    }
+
+    // Nutrition
+    if (data.nutrition && data.nutrition.totals_per_serving) {
+      const n = data.nutrition.totals_per_serving;
+      botHtml += <div class="nutrition"><b>Nutrition (per serving):</b> Calories: ${n.cal}, Protein: ${n.protein}, Carbs: ${n.carbs}, Fat: ${n.fat}, Fiber: ${n.fiber}</div>;
+    }
+
+    // Grocery
+    if (data.grocery && data.grocery.shopping_list.length > 0) {
+      botHtml += <div class="grocery"><b>Grocery List:</b> ${data.grocery.shopping_list.join(', ')}</div>;
+    }
+
+    // Vision / items
+    if (data.vision && data.vision.items.length > 0) {
+      botHtml += '<div class="vision"><b>Detected items:</b><ul>';
+      data.vision.items.forEach(i => {
+        botHtml += <li>${i.name} (Confidence: ${i.confidence})</li>;
+      });
+      botHtml += '</ul></div>';
+    }
+
+    appendMessage(botHtml, 'bot');
+  } catch (err) {
+    appendMessage('Error: ' + err.message, 'bot');
+  }
+};
+</script>
+
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Pantry Chat</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: linear-gradient(135deg,#f5f7fa,#c3cfe2);
+  }
+
+  #chat-container {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .message {
+    max-width: 75%;
+    padding: 15px;
+    border-radius: 20px;
+    word-wrap: break-word;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
+
+  .user {
+    align-self: flex-end;
+    background: linear-gradient(90deg,#667eea,#764ba2);
+    color: white;
+    text-align: right;
+  }
+
+  .bot {
+    align-self: flex-start;
+    background: white;
+    color: #333;
+  }
+
+  .section {
+    margin-bottom: 10px;
+  }
+
+  .section b {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 1.05em;
+  }
+
+  .badge {
+    display: inline-block;
+    background: #f0f0f5;
+    color: #333;
+    padding: 3px 8px;
+    border-radius: 12px;
+    margin: 2px 2px 2px 0;
+    font-size: 0.85em;
+  }
+
+  .nutrition-card {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 5px 0;
+  }
+
+  .nutrient {
+    flex: 1 1 100px;
+    background: #f7f9fc;
+    padding: 8px 10px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9em;
+  }
+
+  .recipe-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 8px;
+    background: #fafafa;
+  }
+
+  #input-container {
+    display: flex;
+    padding: 15px;
+    background: white;
+    border-top: 1px solid #ccc;
+    gap: 10px;
+    align-items: center;
+  }
+
+  #img { flex: 1; }
+  #diet { width: 120px; padding: 8px; border-radius: 8px; border: 1px solid #ccc; }
+  #send-btn {
+    background: linear-gradient(90deg,#667eea,#764ba2);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  #send-btn:hover {
+    opacity: 0.9;
+  }
+</style>
+</head>
+<body>
+
+<div id="chat-container"></div>
+
+<div id="input-container">
+  <input type="file" id="img" accept="image/*">
+  <input type="text" id="diet" placeholder="Diet (keto/paleo)">
+  <button id="send-btn">Send</button>
+</div>
+
 <script src="app.js"></script>
 </body>
 </html>

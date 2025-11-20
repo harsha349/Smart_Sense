@@ -1,7 +1,22 @@
-Flask==2.2.5
-google-cloud-storage==2.10.0
-google-cloud-firestore==2.11.0
-vertexai==0.8.1
-google-cloud-aiplatform==1.32.0
-gunicorn==20.1.0
-Pillow==10.0.0
+# vertexai>=1.70.0
+# google-cloud-aiplatform>=1.70.0
+# Pillow>=10.0.0
+# opencv-python-headless>=4.8.0
+# pandas>=2.1.0
+# numpy>=1.26.0
+# Flask>=2.3.3
+# # gunicorn>=21.2.0
+# requests>=2.32.0
+# jsonschema>=4.21.0
+# gunicorn==20.1.0
+
+Flask>=2.3.3
+gunicorn>=20.1.0
+pandas>=2.1.0
+numpy>=1.26.0
+Pillow>=10.0.0
+opencv-python-headless>=4.8.0
+requests>=2.32.0
+vertexai>=1.71.1
+google-cloud-aiplatform>=1.71.1
+google-cloud-firestore>=2.11.0
